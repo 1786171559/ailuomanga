@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cj.mapper.NoticeMapper">
+    <resultMap id="noticeMapper" type="Notice">
+        <id property="noticeId" column="noticeId"></id>
+        <result property="content" column="content"></result>
+        <result property="publishDate" column="publishDate"></result>
+        <result property="title" column="title"></result>
+        <result property="userId" column="userId"></result>
+        <association property="userInfo" column="userId" javaType="UserInfo">
+            <id property="userId" column="userId2"></id>
+            <result property="userName" column="userName2"></result>
+            <result property="loginName" column="loginName2"></result>
+            <!--            房产信息关联用户信息时，不显示用户密码-->
+            <!--            <result property="password" column="password2"></result>-->
+            <result property="sex" column="sex2"></result>
+            <result property="age" column="age2"></result>
+            <result property="phone" column="phone2"></result>
+            <result property="address" column="address2"></result>
+            <result property="carId" column="carId2"></result>
+            <result property="isEnable" column="isEnable2"></result>
+            <result property="isDelete" column="isDelete2"></result>
+        </association>
+    </resultMap>
+    <select id="selectNoticeOrderByPublishDate" resultMap="noticeMapper">
+        SELECT n.*,
+               u.userId as userId2,
+               u.userName as userName2,
+               u.loginName as loginName2,
+               u.password as password2,
+               u.sex as sex2,
+               u.age as age2,
+               u.phone as phone2,
+               u.address as address2,
+               u.carId as carId2,
+               u.isEnable as isEnable2,
+               u.isDelete as isDelete2
+        FROM notice n,
+             userInfo u
+        WHERE n.userId = u.userId ORDER BY n.publishDate DESC
+    </select>
+</mapper>

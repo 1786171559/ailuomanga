@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cj.mapper.MaintainMapper">
+    <resultMap id="maintainMapper" type="Maintain">
+        <id property="maintainId" column="maintainId"></id>
+        <result property="description" column="description"></result>
+        <result property="taskId" column="taskId"></result>
+        <result property="occurredTime" column="occurredTime"></result>
+        <result property="processingTime" column="processingTime"></result>
+        <result property="finishTime" column="finishTime"></result>
+        <result property="repairId" column="repairId"></result>
+        <result property="score" column="score"></result>
+        <result property="userId" column="userId"></result>
+        <association property="task" column="taskId" javaType="Task">
+            <id property="taskId" column="taskId2"></id>
+            <result property="taskType" column="taskType"></result>
+        </association>
+    </resultMap>
+    <resultMap id="maintainMappers" type="Maintain">
+        <id property="maintainId" column="maintainId"></id>
+        <result property="description" column="description"></result>
+        <result property="taskId" column="taskId"></result>
+        <result property="occurredTime" column="occurredTime"></result>
+        <result property="processingTime" column="processingTime"></result>
+        <result property="finishTime" column="finishTime"></result>
+        <result property="score" column="score"></result>
+        <result property="repairId" column="repairId"></result>
+        <result property="userId" column="userId"></result>
+        <association property="userInfo" column="userId" javaType="UserInfo">
+            <id property="userId" column="userId"></id>
+            <result property="userName" column="userName"></result>
+            <result property="phone" column="phone"></result>
+        </association>
+    </resultMap>
+    <select id="selectMainTainByWhere" resultMap="maintainMapper">
+        SELECT m.*,t.taskId as task2,t.taskType FROM maintain m ,task t WHERE m.taskId=t.taskId
+
+        <if test="taskId!=null">
+            and m.taskId=#{taskId}
+        </if>
+        <if test="userId!=null">
+            and m.userId=#{userId}
+        </if>
+    </select>
+
+    <select id="selectOneMaintainByMaintainId" resultMap="maintainMapper">
+        SELECT m.*, t.taskId as task2, t.taskType
+        FROM maintain m,
+             task t
+        WHERE m.taskId = t.taskId
+          and m.maintainId = #{maintainId}
+    </select>
+
+    <select id="selectMaintainInfoByRepairId" resultMap="maintainMappers">
+        SELECT m.*, u.`userName`, u.`phone`
+        FROM maintain m,
+             userInfo u
+        WHERE m.`userId` = u.`userId`
+          AND m.`repairId` = #{repairId}
+    </select>
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cj.mapper.UserInfoMapper">
+    <resultMap id="userInfoMapper" type="userInfo">
+        <id property="userId" column="userId"></id>
+        <result property="userName" column="userName"></result>
+        <result property="loginName" column="loginName"></result>
+        <result property="password" column="password"></result>
+        <result property="sex" column="sex"></result>
+        <result property="age" column="age"></result>
+        <result property="phone" column="phone"></result>
+        <result property="address" column="address"></result>
+        <result property="carId" column="carId"></result>
+        <result property="isEnable" column="isEnable"></result>
+        <result property="isDelete" column="isDelete"></result>
+        <collection property="roleInfos" ofType="RoleInfo">
+            <id property="roleId" column="roleId"></id>
+            <result property="roleName" column="roleName"></result>
+        </collection>
+    </resultMap>
+    <!-- 通过账户查询当前用户所具备的用户信息和角色信息-->
+    <select id="selectByLoginName" resultMap="userInfoMapper" parameterType="string">
+        SELECT u.*, ri.*
+        FROM userInfo u,
+             roleInfo ri,
+             privilege p
+        WHERE u.userId = p.userId
+          AND p.roleId = ri.roleId
+          AND u.loginName = #{loginName}
+          AND u.isDelete = 1;
+    </select>
+    <!-- 了解的内容，抽取重复的sql语句-->
+    <sql id="defaultUser">
+        select userId,
+               userName,
+               loginName,
+               `password`,
+               sex,
+               age,
+               phone,
+               address,
+               carId,
+               isEnable,
+               isDelete
+        FROM userInfo
+    </sql>
+    <!--    通过条件进行查询-->
+    <select id="selectUsersByWhere" resultType="com.cj.pojo.UserInfo">
+        <include refid="defaultUser"></include>
+        <where>
+            <if test="userId != null and userId != '' ">
+                and userId != #{userId}
+            </if>
+            <if test="isDelete != null and isDelete != '' ">
+                and isDelete = #{isDelete}
+            </if>
+            <if test="userId != null and userId != '' ">
+                and userId != #{userId}
+            </if>
+            <if test="sex != null and sex != '' ">
+                and sex = #{sex}
+            </if>
+            <if test="phone != null  and phone != ''">
+                and phone like #{phone}
+            </if>
+            <if test="userName != null and userName != '' ">
+                and userName like #{userName}
+            </if>
+        </where>
+    </select>
+    <!--  通过角色名称查询用户-->
+    <select id="getUserInfoByRoleName" parameterType="string" resultType="UserInfo">
+        select u.userId,
+               u.userName,
+               u.sex,
+               u.age,
+               u.phone,
+               u.address,
+               u.carId,
+               u.isEnable
+        FROM userInfo u,
+             roleInfo r,
+             privilege p
+        WHERE u.`userId` = p.`userId`
+          AND p.`roleId` = r.`roleId`
+          AND r.roleName = #{roleName}
+          AND u.isDelete = 1
+    </select>
+
+    <!--  通过角色名称查询用户-->
+    <select id="getUserInfoByRoleNameToPage" resultType="UserInfo">
+        select u.userId,
+        u.userName,
+        u.sex,
+        u.age,
+        u.phone,
+        u.address,
+        u.carId,
+        u.isEnable
+        FROM userInfo u,
+        roleInfo r,
+        privilege p
+        WHERE u.userId = p.userId
+        AND p.roleId = r.roleId
+        and r.roleName = '户主'
+        <if test="userName != null and userName != '' ">
+            and u.userName like #{userName}
+        </if>
+        <if test="sex != null and sex != '' ">
+            and u.sex = #{sex}
+        </if>
+        <if test="phone != null  and phone != ''">
+            and u.phone like #{phone}
+        </if>
+        <if test="isDelete != null and isDelete != '' ">
+            and u.isDelete = #{isDelete}
+        </if>
+    </select>
+</mapper>

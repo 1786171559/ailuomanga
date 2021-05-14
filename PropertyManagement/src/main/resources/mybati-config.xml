@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC
+        "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- 开启log4j来记录日志 -->
+        <setting name="logImpl" value="log4j"/>
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+    <!--  使用typeAliases配置别名，注意：只能配置domain中类的别名-->
+    <typeAliases>
+        <!--  默认别名为类名-->
+        <package name="com.cj.pojo"/>
+    </typeAliases>
+</configuration>

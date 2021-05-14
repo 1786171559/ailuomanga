@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cj.mapper.DoComplaintMapper">
+    <resultMap id="doComplaintMapper" type="DoComplaint">
+        <id property="doComplaintId" column="doComplaintId"></id>
+        <result property="complaintId" column="complaintId"></result>
+        <result property="complainter" column="complainter"></result>
+        <result property="complainPhone" column="complainPhone"></result>
+        <result property="complaintContent" column="complaintContent"></result>
+        <result property="handlingPerson" column="handlingPerson"></result>
+        <result property="handlingPhone" column="handlingPhone"></result>
+        <result property="isComplete" column="isComplete"></result>
+        <association property="complaint" column="complaintId" javaType="Complaint">
+            <id property="complaintId" column="complaintId"></id>
+            <result property="complaintType" column="complaintType"></result>
+        </association>
+    </resultMap>
+
+    <select id="selectComplaintInfoByWhere" resultMap="doComplaintMapper" parameterType="DoComplaint">
+
+        SELECT dc.*, c.complaintId, c.complaintType
+        FROM doComplaint dc,
+        complaint c
+        WHERE dc.`complaintId` = c.`complaintId`
+        <if test="complaintId != null and complaintId != '' ">
+            and dc.complaintId
+        </if>
+        <if test="complainPhone != null and complainPhone != '' ">
+            and dc.complainPhone = #{complainPhone}
+        </if>
+        <if test="complainter != null and complainter != '' ">
+            and dc.complainter like #{complainter}
+        </if>
+
+    </select>
+</mapper>

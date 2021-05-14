@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cj.mapper.ResourcesMapper">
+    <resultMap id="resourcesMapper" type="Resources">
+        <id property="resId" column="resId"></id>
+        <result property="resName" column="resName"></result>
+        <result property="resLevel" column="resLevel"></result>
+        <result property="resUrl" column="resUrl"></result>
+        <result property="parentId" column="parentId"></result>
+        <result property="isEnable" column="isEnable"></result>
+        <collection property="resos" ofType="Reso">
+            <id property="resId" column="resId2"></id>
+            <result property="resName" column="resName2"></result>
+            <result property="resLevel" column="resLevel2"></result>
+            <result property="resUrl" column="resUrl2"></result>
+            <result property="parentId" column="parentId2"></result>
+            <result property="isEnable" column="isEnable2"></result>
+        </collection>
+    </resultMap>
+
+    <resultMap id="resourceMapper" type="Resources">
+        <id property="resId" column="resId"></id>
+        <result property="resName" column="resName"></result>
+        <result property="resLevel" column="resLevel"></result>
+        <result property="resUrl" column="resUrl"></result>
+        <result property="parentId" column="parentId"></result>
+        <result property="isEnable" column="isEnable"></result>
+        <association property="roleResource" column="resId" javaType="RoleResource">
+            <id property="resId" column="resId"></id>
+            <result property="roleId" column="roleId"></result>
+            <result property="rsId" column="rsId"></result>
+        </association>
+    </resultMap>
+    <resultMap id="resMapper" type="Resources">
+        <id property="resId" column="resId"></id>
+        <result property="resName" column="resName"></result>
+        <result property="resLevel" column="resLevel"></result>
+        <result property="resUrl" column="resUrl"></result>
+        <result property="parentId" column="parentId"></result>
+        <result property="isEnable" column="isEnable"></result>
+        <association property="reso" column="parentId" javaType="Reso">
+            <id property="resId" column="resId2"></id>
+            <result property="resName" column="resName2"></result>
+            <result property="resLevel" column="resLevel2"></result>
+            <result property="resUrl" column="resUrl2"></result>
+            <result property="parentId" column="parentId2"></result>
+            <result property="isEnable" column="isEnable2"></result>
+        </association>
+    </resultMap>
+    <!--    通过用户id获取所有资源-->
+    <select id="getAllResourcesByUserId" resultMap="resourcesMapper" parameterType="integer">
+        SELECT part1.*,
+               part2.resId    resId2,
+               part2.resName  resName2,
+               part2.resLevel resLevel2,
+               part2.resUrl   resUrl2,
+               part2.parentId parentId2,
+               part2.isEnable isEnable2
+        FROM (SELECT *
+              FROM resources r
+              WHERE resId IN (
+                  SELECT resId
+                  FROM roleResource
+                  WHERE roleId IN (
+                      SELECT roleId
+                      FROM privilege
+                      WHERE userId = #{userId})) and r.isEnable=1) part1,
+             (SELECT *
+              FROM resources r2
+              WHERE resId IN (
+                  SELECT resId
+                  FROM roleResource
+                  WHERE roleId IN (
+                      SELECT roleId
+                      FROM privilege
+                      WHERE userId = #{userId})) and r2.isEnable=1) part2
+        WHERE part1.resId = part2.parentId ;
+    </select>
+    <!--  获取角色对应资源 -->
+    <select id="getRoleReSourcesByRoleId" resultMap="resourceMapper" parameterType="integer">
+        SELECT *
+        FROM resources r
+                 LEFT JOIN roleResource rr ON r.`resId` = rr.`resId` AND roleId = #{roleId};
+    </select>
+    <!--  获取该目录下的子目录-->
+    <select id="getResourceChild" resultMap="resourcesMapper" parameterType="integer">
+        SELECT r.*,
+               rr.resId    resId2,
+               rr.resName  resName2,
+               rr.resLevel resLevel2,
+               rr.resUrl   resUrl2,
+               rr.parentId parentId2,
+               rr.isEnable isEnable2
+        FROM resources r
+                 LEFT JOIN resources rr ON r.`resId` = rr.`parentId`
+        WHERE r.`resId` = #{resId} ;
+    </select>
+    <!--  获取资源信息-->
+    <select id="getResources" resultMap="resMapper">
+
+        SELECT res.*,
+               rr.resId    resId2,
+               rr.resName  resName2,
+               rr.resLevel resLevel2,
+               rr.resUrl   resUrl2,
+               rr.parentId parentId2,
+               rr.isEnable isEnable2
+        FROM resources res
+                 LEFT JOIN resources rr ON res.parentId = rr.resId;
+    </select>
+</mapper>

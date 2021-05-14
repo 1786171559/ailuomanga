@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cj.mapper.LogInfoMapper">
+    <!-- 定义loginfo表的ResultMap-->
+    <resultMap id="logMap" type="LogInfo">
+        <id property="logId" column="logId"></id>
+        <result property="logType" column="logType"></result>
+        <result property="createTime" column="createTime"></result>
+        <result property="appendAddress" column="appendAddress"></result>
+        <result property="description" column="description"></result>
+    </resultMap>
+
+    <!--  新增日志数据-->
+    <insert id="addLogInfo" parameterType="com.cj.pojo.LogInfo">
+        insert into logInfo(logType, appendAddress, description)
+        values (#{logType}, #{appendAddress}, #{description})
+    </insert>
+
+</mapper>
